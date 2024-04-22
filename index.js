@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const port = 3000;
 const ytdl = require('ytdl-core');
+const fs = require('fs');
 const removeAccents = require('remove-accents');
 
 app.use(express.urlencoded({ extended: true }));
@@ -24,8 +25,9 @@ app.post('/download', async (req, res) => {
     let title = info.videoDetails.title;
     title = removeAccents(title); // Remove acentos gráficos
     title = title.replace(/[^\w\s]/gi, ''); // Remove caracteres especiais do título
-    res.set('Content-Disposition', `attachment; filename="${title}.mp3"`);
-    ytdl(url, { filter: 'audioonly' }).pipe(res);
+    const filePath = `C:/Users/gabriel.faleiro/Music/${title}.mp3`; // Caminho absoluto para o diretório de destino
+    ytdl(url, { filter: 'audioonly' }).pipe(fs.createWriteStream(filePath));
+    res.send('Download concluído');
   } catch (error) {
     console.error('Erro ao baixar áudio:', error);
     res.status(500).send('Erro ao baixar áudio');
